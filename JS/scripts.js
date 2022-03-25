@@ -32,24 +32,25 @@ $(document).ready(function(){
 
 				$.getJSON(thisMovieUrl, function(movieKey){
 					
-					// (w300 is the width format of the poster)
+					// image URL for movie poster (w300 is the width format of the poster)
 					var poster = imageBaseUrl+'w300'+nowPlayingData.results[i].poster_path;
 					
-
+					// next 6 statements are pulling basic info  and media for the movie from the results.
 					var title = nowPlayingData.results[i].original_title;
 
 					var releaseDate = nowPlayingData.results[i].release_date;
 
 					var overview = nowPlayingData.results[i].overview;
-					// $('.overview').addClass('overview');
-
+					
 					var voteAverage = nowPlayingData.results[i].vote_average;				
-					// console.log(movieKey)
+					
 					var youtubeKey = movieKey.results[0].key;
 
 					var youtubeLink = 'https://www.youtube.com/watch?v='+youtubeKey;
-					// console.log(youtubeLink)
-
+					
+					// construct the HTML for each movie.
+					// the movie poster is the only thing that shows on the main view.
+					// the rest of the data shows in the modal.
 					var nowPlayingHTML = '';
 					// added in i to nowPlayingHTML. Without it, only the details for the first movie in the results display in the modal no matter which movie poster you click on.
 					nowPlayingHTML += '<div class="col-sm-3 eachMovie">';
@@ -67,6 +68,7 @@ $(document).ready(function(){
 										// nowPlayingHTML += '<div class="genre">Genre: '+genre+'</div><br>';
 										nowPlayingHTML += '<div class="overview">' +overview+ '</div><br>';// Put overview in a separate div to make it easier to style
 										nowPlayingHTML += '<div class="rating">Rating: '+voteAverage+ '/10</div><br>';
+										// fake movie time buttons
 										nowPlayingHTML += '<div class="col-sm-3 btn btn-primary">8:30 AM' + '</div>';
 										nowPlayingHTML += '<div class="col-sm-3 btn btn-primary">10:00 AM' + '</div>';
 										nowPlayingHTML += '<div class="col-sm-3 btn btn-primary">12:30 PM' + '</div>';
@@ -81,10 +83,11 @@ $(document).ready(function(){
 						nowPlayingHTML += '</div>'; //close modal
 					nowPlayingHTML += '</div>'; //close off each div
 
+					// depend the HTML movie block onto the DOM
 					$('#movie-grid').append(nowPlayingHTML);
-					//Without this line, there is nowhere for the posters and overviews to display so it doesn't show up 
-					$('#movieGenreLabel').html("Now Playing");
+					
 					//h1 will change depending on what is clicked. Will display "Now Playing" in this case.
+					$('#movieGenreLabel').html("Now Playing");
 				})
 			}
 		}) 
@@ -112,7 +115,7 @@ $(document).ready(function(){
 
 	function getMoviesByGenre(genre_id){
 		const getMoviesByGenreURL = apiBaseURL + 'genre/' + genre_id + '/movies?api_key=' + apiKey + '&language=en-US&include_adult=false&sort_by=created_at.asc';
-		// console.log(getMoviesByGenreURL);
+		
 
 		$.getJSON(getMoviesByGenreURL, function(genreData){
 			// console.log(genreData)
