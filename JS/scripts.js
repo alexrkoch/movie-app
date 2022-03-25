@@ -9,7 +9,10 @@ $(document).ready(function(){
 	var imageBaseUrl = 'https://image.tmdb.org/t/p/';
 
 	// URL to request for all movies "now playing" 
+	// apiKey variable is available through global scope of config.js (separated to be gitignored).
 	const nowPlayingURL = apiBaseURL + 'movie/now_playing?api_key=' + apiKey;
+
+	
 
 	//==============================================================================
 	//====================== Get "now playing" data on default. ====================
@@ -30,6 +33,7 @@ $(document).ready(function(){
 				// construct the request URL for a particular movie.
 				var thisMovieUrl = apiBaseURL+'movie/'+mid+'/videos?api_key=' + apiKey;
 
+				// movieKey is the data recieved from the http request. the object is created on the fly in this function call, not anywhere before. 
 				$.getJSON(thisMovieUrl, function(movieKey){
 					
 					// image URL for movie poster (w300 is the width format of the poster)
@@ -92,6 +96,9 @@ $(document).ready(function(){
 			}
 		}) 
 	}
+
+
+
 	//==============================================================================
 	//====================== Get movies by genre ===================================
 	//==============================================================================
@@ -114,15 +121,20 @@ $(document).ready(function(){
 					//53 = thriller
 
 	function getMoviesByGenre(genre_id){
+
+		// request URL for a list of movies by genre
 		const getMoviesByGenreURL = apiBaseURL + 'genre/' + genre_id + '/movies?api_key=' + apiKey + '&language=en-US&include_adult=false&sort_by=created_at.asc';
 		
-
+		// make the request
 		$.getJSON(getMoviesByGenreURL, function(genreData){
-			// console.log(genreData)
+			
+			// loop through the movies in the results
 			for(let i = 0; i<genreData.results.length; i++){
 				var mid = genreData.results[i].id;
 				var thisMovieUrl = apiBaseURL+'movie/'+mid+'/videos?api_key=' + apiKey;
 
+				// request for each specific movie, get movie details and media.
+				// I can't figure out where the function argument movieKey is coming from...
 				$.getJSON(thisMovieUrl, function(movieKey){
 					var poster = imageBaseUrl+'w300'+genreData.results[i].poster_path;
 					var title = genreData.results[i].original_title;
@@ -132,6 +144,8 @@ $(document).ready(function(){
 					var youtubeKey = movieKey.results[0].key;
 					var youtubeLink = 'https://www.youtube.com/watch?v='+youtubeKey;
 					var genreHTML = '';
+
+					// generate the movie's HTML block / modal
 					genreHTML += '<div class="col-sm-3 col-md-3 col-lg-3 eachMovie">';
 						genreHTML += '<button type="button" class="btnModal" data-toggle="modal" data-target="#exampleModal'+ i + '" data-whatever="@' + i + '">'+'<img src="'+poster+'"></button>'; 	
 						genreHTML += '<div class="modal fade" id="exampleModal' + i +'" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">';
@@ -168,6 +182,8 @@ $(document).ready(function(){
 		}) 
 	}
 
+
+
 	// call getMoviesByGenre using click function but call getNowPlayingData on default.
 	getNowPlayingData();
 
@@ -175,8 +191,15 @@ $(document).ready(function(){
 	var nowPlayingHTML = '';
 	var genreHTML = '';
 
+
+
+	// .click attaches an event handler for clicks on the targeted element.
 	$('.navbar-brand').click(function(){
+		
+		// make the proper request, create movie html blocks and append them to the DOM.
 		getNowPlayingData();
+		
+		// $().html()
 		$('#movie-grid').html(nowPlayingHTML);
 		$('#movieGenreLabel').html("Now Playing");
 	})		
@@ -256,6 +279,8 @@ $(document).ready(function(){
 		$('#movieGenreLabel').html("Thriller");
 	})
 
+
+	
 	//==============================================================================
 	//====================== Search Function =======================================
 	//==============================================================================
@@ -263,30 +288,43 @@ $(document).ready(function(){
 	//Run function searchMovies AFTER an input has been submitted. Submit form first.
 	//Run searchMovies once to add an empty html to movie-grid using .html(). Then, overwrite it with the new html using .append(). Need to use .append() to overwrite or all the images will display on top of each other.
 
+	// not sure why searchTerm is global?
 	var searchTerm = '';
+
+	// this is run automatically on page load?
 	searchMovies();
-	//reference entire search form
+
+	//reference entire search form, fires off when submit button is pressed.
 	$('.searchForm').submit(function(event){
+
+		// sets the movie-grid element to be empty.
 		$('#movie-grid').html('');
+		
+		// I think this prevents the "submit" field of the search form from submitting like a typical form would. Instead we want to use the entry into that field in a customized way.
 		event.preventDefault();
 		//search term is only concerned with what the user inputted 
+
 		//Get input with .val();
 		searchTerm = $('.form-control').val();
+
+		// call searchMovies function now that global searchTerm is entered.
 		searchMovies();
 	})
 
 	function searchMovies(){
+
 		//need to include query in url. (ex: &query=boss+baby)
 		const searchMovieURL = apiBaseURL + 'search/movie?api_key=' + apiKey + '&language=en-US&page=1&include_adult=false&query=' + searchTerm;
-			// console.log(searchMovieURL);
+			
+		// request for set of movies from from search results
 		$.getJSON(searchMovieURL, function(movieSearchResults){
-			// console.log(movieSearchResults);
+			
 			for (let i = 0; i<movieSearchResults.results.length; i++){
 				var mid = movieSearchResults.results[i].id;
 				var thisMovieUrl = apiBaseURL+'movie/'+mid+'/videos?api_key=' + apiKey;		
 
 				$.getJSON(thisMovieUrl, function(movieKey){
-					// console.log(movieKey)
+					
 					var poster = imageBaseUrl+'w300'+movieSearchResults.results[i].poster_path;
 					var title = movieSearchResults.results[i].original_title;
 					var releaseDate = movieSearchResults.results[i].release_date;
