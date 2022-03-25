@@ -1,10 +1,14 @@
+
+// highest level jQuery function, runs win the DOM is ready for javascript to run.
 $(document).ready(function(){
-	// The base url for all API calls
+
+	// (The base url for all API calls)
 	var apiBaseURL = 'http://api.themoviedb.org/3/';
 
-	// URL in Authentication. Base URL of image
+	// (URL in Authentication. Base URL of image)
 	var imageBaseUrl = 'https://image.tmdb.org/t/p/';
 
+	// URL to request for all movies "now playing" 
 	const nowPlayingURL = apiBaseURL + 'movie/now_playing?api_key=' + apiKey;
 
 	//==============================================================================
@@ -12,38 +16,25 @@ $(document).ready(function(){
 	//=================== Change results when a genre is clicked on.================
 	//==============================================================================
 	function getNowPlayingData(){
+
+		// jQuery function to make an HTTP request: $.getJSON(request URL, function to perform on success)
 		$.getJSON(nowPlayingURL, function(nowPlayingData){
-			// console.log(nowPlayingData);
-			//we needed to add .results because nowPlayingData is an array.
+
+			// loop through each movie in the nowPlayingData results, 
+			// (we needed to add .results because nowPlayingData is an array.)
 			for(let i = 0; i<nowPlayingData.results.length; i++){
-				// w300 is how wide it is
+				
+				// (mid = movie ID)
 				var mid = nowPlayingData.results[i].id;
-				// mid = movie ID
+				
+				// construct the request URL for a particular movie.
 				var thisMovieUrl = apiBaseURL+'movie/'+mid+'/videos?api_key=' + apiKey;
-				// console.log(i)
 
 				$.getJSON(thisMovieUrl, function(movieKey){
-					// console.log(i);
-					// console.log(thisMovieUrl)
-					// console.log(movieKey)
-
-					//Need to go to that specific movie's URL to get the genres associated with it. (movieKey.id)
-					// var getGenreNameUrl = apiBaseURL + 'movie/' +movieKey.id+ '?api_key=' + apiKey;
-					// console.log(getGenreNameUrl);
-					// console.log(movieKey.id);
-
-					// $.getJSON(getGenreNameUrl, function(genreNames){
-					// 	// console.log(genreNames);//an object
-					// 	// console.log(genreNames.genres[0].name);
-
-					// 	for (let j=0; j<genreNames.genres.length; j++){
-					// 		var genre = genreNames.genres[0].name;
-					// 		// console.log(genre);
-					// 	}
-					// })
-
+					
+					// (w300 is the width format of the poster)
 					var poster = imageBaseUrl+'w300'+nowPlayingData.results[i].poster_path;
-					// console.log(poster);
+					
 
 					var title = nowPlayingData.results[i].original_title;
 
@@ -173,6 +164,7 @@ $(document).ready(function(){
 			}
 		}) 
 	}
+
 	// call getMoviesByGenre using click function but call getNowPlayingData on default.
 	getNowPlayingData();
 
